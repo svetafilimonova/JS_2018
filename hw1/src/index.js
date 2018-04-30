@@ -86,23 +86,22 @@ function returnArgumentsArray() {
  Функция должна принимать другую функцию (F) и некоторое количество дополнительных аргументов
  Функция должна привязать переданные аргументы к функции F и вернуть получившуюся функцию
 
- Пример:
-   function sum(a, b) {
-     return a + b;
-   }
-
-   var newSum = bindFunction(sum, 2, 4);
-
-   console.log(newSum()) выведет 6
- */
-// function bindFunction(fn) {
-//     var args = Array.from(arguments);
-    
-//     return function() {
-//        return fn.call(this, args);
-//     }
-    
+ Пример:*/
+// function sum(a, b) {
+//     return a + b;
 // }
+
+function bindFunction(fn) {
+    var args = Array.from(arguments).slice(1);
+    
+    return function() {
+        return fn.apply(fn, args);
+    }    
+}
+
+// var newSum = bindFunction(sum, 2, 4);
+
+// console.log(newSum());
 
 export {
     returnFirstArgument,

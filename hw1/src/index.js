@@ -91,12 +91,18 @@ function returnArgumentsArray() {
 //     return a + b;
 // }
 
-function bindFunction(fn) {
-    var args = Array.from(arguments).slice(1);
+// function bindFunction(fn) {
+//     var args = Array.from(arguments).slice(1);
     
-    return function() {
-        return fn.apply(fn, args);
-    }    
+//     return function() {
+//         return fn.apply(fn, args);
+//     }    
+// }
+
+function bindFunction(fn) {
+    
+    return fn.bind(fn, ...Array.from(arguments).slice(1));
+
 }
 
 // var newSum = bindFunction(sum, 2, 4);

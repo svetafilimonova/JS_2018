@@ -17,6 +17,24 @@
    isAllTrue([100, 2, 3, 4, 5], n => n < 10) // вернет false
  */
 function isAllTrue(array, fn) {
+    var comparison = true;
+
+    if (!(array instanceof Array) || array.length === 0) {
+        throw new Error('empty array');
+    }
+
+    if (typeof fn !== 'function') {
+        throw new Error('fn is not a function');
+    }
+  
+    var result;
+
+    for (let elem of array) {
+        result = fn(elem);
+        comparison = comparison && result;
+    }
+
+    return comparison;
 }
 
 /*
@@ -36,6 +54,22 @@ function isAllTrue(array, fn) {
    isSomeTrue([1, 2, 3, 4, 5], n => n > 20) // вернет false
  */
 function isSomeTrue(array, fn) {
+    var result = false;
+
+    if (!(array instanceof Array) || array.length === 0) {
+        throw new Error('empty array');
+    } 
+    if (typeof fn !=='function') {
+        throw new Error('fn is not a function');
+    }
+    var comparison; 
+
+    for (let elem of array) {
+        comparison = fn(elem);
+        result = result || comparison;
+    }
+
+    return result;
 }
 
 /*
@@ -49,7 +83,26 @@ function isSomeTrue(array, fn) {
  3.3: Необходимо выбрасывать исключение в случаях:
    - fn не является функцией (с текстом "fn is not a function")
  */
-function returnBadArguments(fn) {
+function returnBadArguments(fn, ...args) {
+
+    if (typeof fn !=='function') {
+        throw new Error('fn is not a function');
+    }
+
+    var result = [];
+
+    for (let elem of args) {
+        try {
+            fn(elem);
+
+        } catch (e) {
+            result.push(elem);
+        }
+
+    }
+
+    return result;
+
 }
 
 /*
@@ -69,9 +122,56 @@ function returnBadArguments(fn) {
    - number не является числом (с текстом "number is not a number")
    - какой-либо из аргументов div является нулем (с текстом "division by 0")
  */
-function calculator() {
+function calculator(num = 0, ...args) {
+
+    function isNumeric(n) {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+
+    if (!(isNumeric(num))) {
+        throw new Error('number is not a number');
+    }
+
+    return {
+        sum: function(...args) {
+            for ( let elem of args) {
+                num += elem;
+            }
+            
+            return num;
+        },
+        dif: function(...args) {
+            for ( let elem of args) {
+                num -= elem;
+            }
+          
+            return num;
+        },
+        mul: function(...args) {
+            for ( let elem of args) {
+                num *= elem;
+            }
+        
+            return num;
+        },
+        div: function(...args) {
+  
+            for ( let elem of args) {
+                if (num === 0 || elem === 0 ) {
+                    throw new Error('division by 0');
+                }
+                num /= elem;
+            }
+      
+            return num;
+        }
+    
+    }
 }
 
+// var calc = calculator();
+
+// console.log(calc.sum(1, 2, 3));
 /* При решении задач, пострайтесь использовать отладчик */
 
 export {

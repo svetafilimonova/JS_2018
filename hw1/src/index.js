@@ -101,7 +101,7 @@ function returnArgumentsArray() {
 
 function bindFunction(fn) {
     
-    return fn.bind(fn, ...Array.from(arguments).slice(1));
+    return fn.bind(...arguments);
 
 }
 

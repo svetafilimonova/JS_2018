@@ -115,15 +115,11 @@ function slice(array, from = 0, to = array.length) {
  */
 function createProxy(obj) {
     const proxy = new Proxy(obj, {
-        get(obj, prop ) {
-            return obj[prop];
-        },
         set(obj, prop, value) {
             if(isFinite(value)) {
                 obj[prop] = value * value;
                 return true;
-            }
-            
+            }  
         }
 
     });

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <button id = "button">Button</button>
+    <script>
+        var el = document.getElementById('button');
+function once(target, fn) {
+    // const myEvent = new CustomEvent('click');
+
+    // target.addEventListener('click', fn);
+    // target.addEventListener('click', () => {
+    //     target.removeEventListener('click', fn); 
+    // });
+    // target.dispatchEvent(myEvent);
+    
+    target.addEventListener('click', fn);
+    target.addEventListener('click', () => {
+        target.removeEventListener('click', fn); 
+    });
+    
+
+    // target.addEventListener('click', fn);
+    // 
+
+}
+once(el,()=>console.log("done"));
+    </script>
+</body>
+</html>

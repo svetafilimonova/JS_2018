@@ -6,29 +6,49 @@
     <title>Document</title>
 </head>
 <body>
-    <button id = "button">Button</button>
+    <div id="homework-container">
+        <button id = "button">Button</button>
+
+    </div>
     <script>
-        var el = document.getElementById('button');
-function once(target, fn) {
-    // const myEvent = new CustomEvent('click');
+        document.addEventListener('DOMContentLoaded', function() {
+            const el = document.getElementById('button');
+            const homeworkContainer = document.querySelector('#homework-container');
 
-    // target.addEventListener('click', fn);
-    // target.addEventListener('click', () => {
-    //     target.removeEventListener('click', fn); 
-    // });
-    // target.dispatchEvent(myEvent);
-    
-    target.addEventListener('click', fn);
-    target.addEventListener('click', () => {
-        target.removeEventListener('click', fn); 
-    });
-    
+            el.addEventListener('click', function() {
+                
+                let block = document.createElement('div');
+                block.classList.add('draggable-div');
+                block.style.backgroundColor = getRandomColor();
+                block.style.width = getValues();
+                block.style.height = getValues();
+                block.style.position = 'absolute';
+                block.style.top = getValues();
+                block.style.left = getValues();
+                block.draggable = true;
 
-    // target.addEventListener('click', fn);
-    // 
+                el.appendChild(block);
 
-}
-once(el,()=>console.log("done"));
+
+                return block;
+
+            });
+                function getValues() {
+                    let result = "";
+                    return result = Math.floor(Math.random() * 100) + 100 + "px";
+                };
+                console.log(getValues());
+               function getRandomColor() {
+                var letters = '0123456789ABCDEF';
+                var color = '#';
+                for (var i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            };
+            console.log(getRandomColor());
+
+        });
     </script>
 </body>
 </html>

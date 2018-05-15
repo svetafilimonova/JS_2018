@@ -66,11 +66,48 @@ function createDiv() {
    homeworkContainer.appendChild(newDiv);
    addListeners(newDiv);
  */
-function addListeners(target, fn) {
-    target.draggable = true;
-    target.addEventListener('dragstart', fn, false);
-    target.addEventListener('drop', fn, false);
-    target.addEventListener('dragend', fn, false);
+function addListeners(target) {
+    const homeworkContainer = document.querySelector('#homework-container');
+
+    target.addEventListener('mousedown', function(e) {
+        var coords = getCoords(target);
+        var posX = e.pageX - coords.left;
+        var posY = e.pageY - coords.top;
+
+        homeworkContainer.appendChild(target);
+        moveObject(e);
+
+        target.addEventListener('mouseup', mouseUpHandler);
+
+        function moveObject(e) {
+            target.style.left = e.pageX - posX + 'px';
+            target.style.top = e.pageY- posY + 'px';
+        }
+    
+        document.onmousemove = function(e) {
+            moveObject(e);
+        }
+
+        function mouseUpHandler () {
+            document.onmousemove = null;
+            target.onmouseup = null;
+        }
+
+        target.ondragstart = function() {
+            return false;
+        };
+    
+        function getCoords(elem) {
+            var box = elem.getBoundingClientRect();
+
+            return {
+                top: box.top + pageYOffset,
+                left: box.left + pageXOffset
+            };
+        }
+
+    });
+  
 }
 
 let addDivButton = homeworkContainer.querySelector('#addDiv');

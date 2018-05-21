@@ -37,6 +37,7 @@ const filterInput = homeworkContainer.querySelector('#filter-input');
 /* Блок с результатами поиска */
 const filterResult = homeworkContainer.querySelector('#filter-result');
 let towns = [];
+const url = 'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json';
 /*
  Функция должна вернуть Promise, который должен быть разрешен с массивом городов в качестве значения
 
@@ -45,72 +46,77 @@ let towns = [];
  */
 
 function loadTowns() {
-  
-    var url = 'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json';
-
     return new Promise(function(resolve, reject) {
 
-        var xhr = new XMLHttpRequest();
+        const xhr = new XMLHttpRequest();
 
         xhr.responseType = 'json';
         xhr.open('Get', url, true);
 
         xhr.onload = function() {
             if (this.status === 200) {
-              
-                var response = [...this.response];
+                let response = [...this.response];
 
-                response = response.sort( (a, b) => {
+                response.sort( (a, b) => {
                     let aName = a.name;
                     let bName = b.name;
-
+    
                     if (aName < bName) {
                         return -1;
                     } else if (aName > bName) {
                         return 1;
                     } 
-
+    
                     return 0;
           
                 });
-                loadingBlock.style.display = 'none';
-                filterBlock.style.display = 'block';
-                towns = response;
                 resolve(response);
               
             } else {
-                reject(); 
+                reject(new Error('Не удалось загрузить города')); 
             }
         }
 
         xhr.send();
         xhr.onerror = function () {
-            
-            loadingBlock.innerText = 'Не удалось загрузить города';
-
-            if (!(homeworkContainer.querySelector('.reload-btn'))) {
-                var reload = document.createElement('button');
-
-                reload.classList.add('reload-btn');
-                reload.innerText = 'Повторить';
-                homeworkContainer.appendChild(reload);
-            }
-
-            homeworkContainer.addEventListener('click', function (e) {
-                if (!(e.target.classList.contains('reload-btn'))) { 
-                    return; 
-                }
-
-                loadTowns();
-                homeworkContainer.removeChild(reload);
-
-            });
-
+            reject(new Error('Не удалось загрузить города')); 
         }
 
     }) 
 }
 
+let myTowns = loadTowns();
+
+myTowns.then(
+    response => {
+        loadingBlock.style.display = 'none';
+        filterBlock.style.display = 'block';
+        towns = response;
+    },
+    error => {
+
+        loadingBlock.innerText = error.message;
+        let reload = document.createElement('button');
+
+        if (!(homeworkContainer.querySelector('.reload-btn'))) {
+
+            reload.classList.add('reload-btn');
+            reload.innerText = 'Повторить';
+            homeworkContainer.appendChild(reload);
+        }
+
+        homeworkContainer.addEventListener('click', function (e) {
+            if (!(e.target.classList.contains('reload-btn'))) { 
+                return; 
+            }
+
+            loadTowns();
+            homeworkContainer.removeChild(reload);
+
+        });
+
+    }
+);
 /*
  Функция должна проверять встречается ли подстрока chunk в строке full
  Проверка должна происходить без учета регистра символов
@@ -125,7 +131,7 @@ function loadTowns() {
 function isMatching(full, chunk) {
     full = full.toLowerCase();
     chunk = chunk.toLowerCase();
-    var index = full.indexOf(chunk);
+    let index = full.indexOf(chunk);
 
     return !(index === -1);
 }
@@ -134,8 +140,8 @@ function isMatching(full, chunk) {
 
 filterInput.addEventListener('keyup', function() {
     // это обработчик нажатия кливиш в текстовом поле
-    var inputValue = filterInput.value;
-    var matchingTowns = [];
+    let inputValue = filterInput.value;
+    let matchingTowns = [];
 
     let results = filterResult.children;
 
@@ -148,8 +154,8 @@ filterInput.addEventListener('keyup', function() {
         });
 
         for (let town of matchingTowns) {
-            var townName = town.name;
-            var div = document.createElement('div');
+            let townName = town.name;
+            let div = document.createElement('div');
 
             div.innerText = townName;
             filterResult.appendChild(div);   

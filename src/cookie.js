@@ -69,7 +69,7 @@ filterNameInput.addEventListener('keyup', function() {
 addButton.addEventListener('click', () => {
     // здесь можно обработать нажатие на кнопку "добавить cookie"
 
-    if (addNameInput.value !== '' && addNameInput.value !== '') {
+    if (addNameInput.value !== '' && addValueInput.value !== '') {
         let filter = filterNameInput.value;
 
         if (filter !=='' && (addNameInput.value.indexOf(filter) === -1) && (addValueInput.value.indexOf(filter)=== -1)) {
@@ -87,23 +87,8 @@ addButton.addEventListener('click', () => {
             return;
         }
 
-        document.cookie = `${addNameInput.value}=${addValueInput.value}` || {}
+        document.cookie = `${addNameInput.value}=${addValueInput.value}` || {};
         cookies[addNameInput.value] =addValueInput.value;
-  
-        let newRow = document.createElement('tr');
-        let nameCell = document.createElement('td');
-        let valCell = document.createElement('td');
-        let btnCell = document.createElement('td');
-        let deleteBtn = document.createElement('button');
-  
-        nameCell.innerText = addNameInput.value;
-        valCell.innerText = addValueInput.value;
-        deleteBtn.innerHTML = 'Удалить';
-        btnCell.appendChild(deleteBtn);
-        newRow.appendChild(nameCell);
-        newRow.appendChild(valCell);
-        newRow.appendChild(btnCell);
-        listTable.appendChild(newRow);
   
         clearTable(listTable);
         renderCookie(cookies);

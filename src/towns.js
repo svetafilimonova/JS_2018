@@ -85,38 +85,41 @@ function loadTowns() {
     }) 
 }
 
-let myTowns = loadTowns();
+function onSuccess(response) {
+    loadingBlock.style.display = 'none';
+    filterBlock.style.display = 'block';
+    towns = response;
 
-myTowns.then(
-    response => {
-        loadingBlock.style.display = 'none';
-        filterBlock.style.display = 'block';
-        towns = response;
-    },
-    error => {
+}
 
-        loadingBlock.innerText = error.message;
-        let reload = document.createElement('button');
+function onReject(error) {
+    
+    loadingBlock.innerText = error.message;
+    let reload = document.createElement('button');
 
-        if (!(homeworkContainer.querySelector('.reload-btn'))) {
+    if (!(homeworkContainer.querySelector('.reload-btn'))) {
 
-            reload.classList.add('reload-btn');
-            reload.innerText = 'Повторить';
-            homeworkContainer.appendChild(reload);
+        reload.classList.add('reload-btn');
+        reload.innerText = 'Повторить';
+        homeworkContainer.appendChild(reload);
+    }
+
+    homeworkContainer.addEventListener('click', function (e) {
+        if (!(e.target.classList.contains('reload-btn'))) { 
+            return; 
         }
 
-        homeworkContainer.addEventListener('click', function (e) {
-            if (!(e.target.classList.contains('reload-btn'))) { 
-                return; 
-            }
+        loadTowns().then(onSuccess).catch(onReject);
 
-            loadTowns();
-            homeworkContainer.removeChild(reload);
 
-        });
+        homeworkContainer.removeChild(reload);
 
-    }
-);
+    });
+
+}
+let myTowns = loadTowns();
+
+myTowns.then(onSuccess).catch(onReject);
 /*
  Функция должна проверять встречается ли подстрока chunk в строке full
  Проверка должна происходить без учета регистра символов

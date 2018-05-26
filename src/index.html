@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="styles.css">
+    <title>Friends sieve</title>
+</head>
+
+<body>
+
+<div class="wrapper">
+    <div class="header"></div>
+    <div class="container"></div>
+<div class="app">
+    <div class="app__title">
+        <div class="app__title-text">Выберите друзей</div>
+        <div class="app__title-btn">
+            <div class="button button--close button--white"> 
+                <span class="button__line button__line-h"></span>
+                <span class="button__line button__line-v"></span>
+            </div>
+        </div>
+    </div>
+    <div class="app__workspace">
+        <div class="workspace__column all-friends">
+        <div class="workspace__panel">
+            <div class="search">
+                <div class="search__decoration"></div>
+                <input type="text" class="search__input" placeholder="Начните вводить имя друга">
+            </div>
+        </div>
+            <div class="workspace__title"></div>
+            <ul class="friends">
+                <li class="friends__friend"></li>
+            </ul>
+        </div>
+        <div class="workspace__column selected">
+            <div class="workspace__panel">
+                <div class="search">
+                    <div class="search__decoration"></div>
+                    <input type="text" class="search__input"
+                    placeholder="Начните вводить имя друга">
+                </div>
+            </div>
+            <div class="workspace__title"></div>
+            <ul class="friends">
+                <li class="friends__friend friends__friend--selected"></li>
+            </ul>
+        </div>
+ </div>
+    <div class="app__backup">
+        <button type="button" class="saver">Сохранить</button>
+    </div>
+</div>
+</div>
+    
+  
+  <script src="main.js"></script>
+</body>
+</html>

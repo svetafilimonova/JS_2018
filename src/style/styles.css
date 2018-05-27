@@ -1,6 +1,10 @@
 * {
     box-sizing: border-box;
 }
+
+body {
+    font-family: 'Fira Sans', sans-serif;
+}
 .container {
     position: absolute;
     top: 0;
@@ -16,7 +20,7 @@
     width: 130px;
     height: 37px;
     margin: 90px auto 0;
-    background-image: url("logo.png");
+    background-image: url("../img/logo.png");
 }
 
 .app {
@@ -60,6 +64,11 @@
 }
 
 
+
+.button--add .button__line-v {
+    transform: rotate(90deg);
+}
+
 .button--white .button__line {
     background-color: #ffffff;
 }
@@ -86,7 +95,8 @@
 .search__decoration {
     width: 13px;
     height: 13px;
-    background-image: url("loupe.png");
+    background-image: url("../img/loupe.png");
+    background-repeat: no-repeat;
     position: absolute;
     top: 7px;
     left: 7px;
@@ -111,3 +121,55 @@
 
 
 }
+ul li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul {
+    padding: 0;
+    margin: 0;  
+}
+
+.friends {
+    width: 90%;
+    margin: auto;
+}
+.friend {
+    display: flex; 
+    align-items: center;
+    padding: 5px;
+    border-bottom: 1px solid #f0f0f0;
+    position: relative;
+    transition: .3s;
+}
+
+.friend__avatar {
+    border-radius: 50%;
+    overflow: hidden;
+    width: 45px;
+    height: 45px;
+    margin-right: 6px;
+}
+
+.workspace__title {
+  padding: 15px 15px 8px; 
+  border-bottom: 1px solid #f0f0f0;
+  width: 90%;
+  margin: auto;
+}
+
+.workspace__column.all-friends {
+    border-right: 2px solid #f0f0f0;  
+}
+
+.button--friends {
+    position: absolute;
+    right: 27px;
+}
+
+.friend:hover {
+    background-color: #f0f0f0;
+}
+

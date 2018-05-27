@@ -1,0 +1,26 @@
+{{#each items}}
+<li class="friend">
+    <div class="friend__avatar">
+        <img src="{{img}}">
+    </div>
+    <div class="friend__name">{{name}} {{last_name}}</div>
+    <div class="button button--add button--friends ">
+        <span class="button__line button__line-h"></span>
+        <span class="button__line button__line-v"></span>
+    </div>
+</li>
+{{/each}}
+
+{{#each chosen}}
+<li class="friend">
+    <div class="friend__avatar">
+        <img src="{{img}}">
+    </div>
+    <div class="friend__name">{{name}} {{last_name}}</div>
+ 
+    <div class="button button--close button--friends">
+        <span class="button__line button__line-h"></span>
+        <span class="button__line button__line-v"></span>
+    </div>
+</li>
+{{/each}}

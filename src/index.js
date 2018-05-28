@@ -2,27 +2,11 @@ import render from './templates/friend.hbs';
 
 import './style/styles.css';
 
-// let items = [
-//     { name: 'Harry',
-//         last_name: 'Kasparov',
-//         img: 'https://pp.userapi.com/c639225/v639225708/4888/XPJ3OPWsw1Q.jpg'
-//     },
-//     { name: 'Harry',
-//         last_name: 'Wallas',
-//         img: 'https://pp.userapi.com/c840136/v840136848/3d874/sCKtLZwA59A.jpg' }
-// ];
-
-let chosen = [
-    { first_name: 'Sandy',
-        last_name: 'Claws',
-        photo_50: 'https://pp.userapi.com/c639224/v639224147/f582/8fnPWTvAVUw.jpg'
-    }
-];
-
+let chosen = [];
 let selected = document.querySelector('.friends--selected');
-let block = document.querySelector('.friends');
+let allFriends = document.querySelector('.friends');
 
-selected.innerHTML = render({ chosen });
+selected.innerHTML = render({ 'items': chosen, 'chosens': true });
 
 document.addEventListener('DOMContentLoaded', function() {
     VK.init({
@@ -63,6 +47,83 @@ document.addEventListener('DOMContentLoaded', function() {
 
         console.log(items);
         console.log(response);
-        block.innerHTML = render({ items });
+        allFriends.innerHTML = render({ 'items': items, 'chosens': false });
     })
 });
+
+// let dragSrcElem = null;
+
+function moveFriend(friend, source, destination) {
+    console.log('move');
+
+}
+
+allFriends.addEventListener('dragstart', function(e) {
+    if (!(e.target.classList.contains('friend'))) {
+ return; 
+}
+
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', e.target.innerHTML);
+    // e.dataTransfer.setData('text/html', this.innerHTML);
+    // dragSrcElem = this;
+
+    console.log('move');
+})
+
+selected.addEventListener('dragover', function(e) {
+
+    if (e.preventDefault) {
+        e.preventDefault();
+    }
+    
+    //   e.dataTransfer.dropEffect = 'move';  
+    console.log('over-draggage');
+    
+    return false;
+})
+
+selected.addEventListener('dragenter', function(e) {
+
+    if (e.preventDefault) {
+        e.preventDefault();
+    }
+    
+    //   e.dataTransfer.dropEffect = 'move';  
+    console.log('drag-enterance');
+    
+    return false;
+})
+
+selected.addEventListener('drop', function(e) {
+
+    // if (e.stopPropagation) {
+    //     e.stopPropagation(); 
+    // }
+
+    let target = e.target;
+        
+    let data = e.dataTransfer.getData('text/html');
+
+    console.log(data);
+
+    // if (dragSrcEl != this) {
+    //     // Set the source column's HTML to the HTML of the columnwe dropped on.
+    //     dragSrcEl.innerHTML = this.innerHTML;
+    //     this.innerHTML = e.dataTransfer.getData('text/html');
+    // }
+
+    if (target.classList.contains('friends--selected')) {
+        
+        let newLI = document.createElement('li');
+
+        newLI.classList.add('friend');
+        newLI.innerHTML = data;
+        target.appendChild(newLI);
+
+    }
+
+    e.preventDefault();
+
+    return false;
+})

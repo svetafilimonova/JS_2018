@@ -45,6 +45,8 @@ body {
 .button {
     position: relative;
     right: 15px;
+    width: 16px;
+    height: 16px;
 }
 .button__line {
     background-color: #c4c4c4;
@@ -192,6 +194,7 @@ ul {
 .button--friends {
     position: absolute;
     right: 27px;
+    top: 25px;
 }
 
 .friend:hover {

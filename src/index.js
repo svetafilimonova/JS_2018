@@ -2,11 +2,29 @@ import render from './templates/friend.hbs';
 
 import './style/styles.css';
 
-let chosen = [];
+let chosens = [];
+let all = [];
 let selected = document.querySelector('.friends--selected');
 let allFriends = document.querySelector('.friends');
+let parentElem = document.querySelector('.app__workspace');
 
-selected.innerHTML = render({ 'items': chosen, 'chosens': true });
+selected.innerHTML = render({ 'items': chosens, 'chosens': true });
+
+function clearList(list) {
+    while (list.hasChildNodes()) {
+        list.removeChild(list.lastChild);
+    }
+}
+
+function findAndRemove(friendId, allfriendArr) {
+    const position = allfriendArr.findIndex((elem) => {
+        return elem.id == friendId
+    });
+
+    let chosenFriend = allfriendArr.splice(position, 1); 
+
+    return chosenFriend;
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     VK.init({
@@ -43,87 +61,108 @@ document.addEventListener('DOMContentLoaded', function() {
         return callAPI('friends.get', { count: 100, fields: 'photo_50' })
     }).then((response)=> { 
         
-        let items = response.items;
-
-        console.log(items);
-        console.log(response);
-        allFriends.innerHTML = render({ 'items': items, 'chosens': false });
+        all = response.items;
+        
+        allFriends.innerHTML = render({ 'items': all, 'chosens': false });
     })
+
+    parentElem.addEventListener('dragstart', function(e) {
+        if (!(e.target.classList.contains('friend')) &&
+        (e.target.closest('ul').classList.contains('friends--selected')) ) {
+            return; 
+        }
+    
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', e.target.dataset.id);
+
+    })
+
+    parentElem.addEventListener('dragover', function(e) {
+
+        if (e.preventDefault) {
+            e.preventDefault();
+        }
+    
+        return false;
+    })
+
+    parentElem.addEventListener('dragenter', function(e) {
+
+        if (e.preventDefault) {
+            e.preventDefault();
+        }
+
+        return false;
+    })
+
+    parentElem.addEventListener('drop', function(e) {
+        if (!(e.target.closest('ul').classList.contains('friends--selected'))) {
+            return;
+        }
+
+        let idOfTheSelected = e.dataTransfer.getData('text/html');
+
+        // get the transferred item
+        // const position = all.findIndex((elem) => {
+        //     return elem.id == idOfTheSelected
+        // });
+    
+        // let chosenFriend = all.splice(position, 1);
+
+        let chosenFriend = findAndRemove(idOfTheSelected, all);
+
+        chosens.push(...chosenFriend);
+        console.log(chosenFriend);
+        clearList(allFriends);
+        allFriends.innerHTML = render({ 'items': all, 'chosens': false });
+
+        clearList(selected);
+        selected.innerHTML = render({ 'items': chosens, 'chosens': true });
+
+        e.preventDefault();
+
+        return false;
+
+    });
+
+    allFriends.addEventListener('click', (e) => {
+        
+        if(!(e.target.classList.contains('button__line'))) return;
+
+        let friend = e.target.closest('li');
+
+        let friendId = friend.dataset.id;
+
+        let chosenFriend = findAndRemove(friendId, all);
+
+        chosens.push(...chosenFriend);
+        clearList(allFriends);
+        allFriends.innerHTML = render({ 'items': all, 'chosens': false });
+
+        clearList(selected);
+        selected.innerHTML = render({ 'items': chosens, 'chosens': true });
+
+        console.log(friend);
+        console.log(friendId);
+    });
+
+    selected.addEventListener('click', (e) => {
+        if(!(e.target.classList.contains('button__line'))) return;
+
+        let friend = e.target.closest('li');
+
+        let friendId = friend.dataset.id;
+
+        let chosenFriend = findAndRemove(friendId, chosens);
+
+        all.push(...chosenFriend);
+
+        clearList(allFriends);
+        allFriends.innerHTML = render({ 'items': all, 'chosens': false });
+
+        clearList(selected);
+        selected.innerHTML = render({ 'items': chosens, 'chosens': true });
+
+    });
+
 });
-
-// let dragSrcElem = null;
-
-function moveFriend(friend, source, destination) {
-    console.log('move');
-
-}
-
-allFriends.addEventListener('dragstart', function(e) {
-    if (!(e.target.classList.contains('friend'))) {
- return; 
-}
-
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/html', e.target.innerHTML);
-    // e.dataTransfer.setData('text/html', this.innerHTML);
-    // dragSrcElem = this;
-
-    console.log('move');
-})
-
-selected.addEventListener('dragover', function(e) {
-
-    if (e.preventDefault) {
-        e.preventDefault();
-    }
-    
-    //   e.dataTransfer.dropEffect = 'move';  
-    console.log('over-draggage');
-    
-    return false;
-})
-
-selected.addEventListener('dragenter', function(e) {
-
-    if (e.preventDefault) {
-        e.preventDefault();
-    }
-    
-    //   e.dataTransfer.dropEffect = 'move';  
-    console.log('drag-enterance');
-    
-    return false;
-})
-
-selected.addEventListener('drop', function(e) {
-
-    // if (e.stopPropagation) {
-    //     e.stopPropagation(); 
-    // }
-
-    let target = e.target;
-        
-    let data = e.dataTransfer.getData('text/html');
-
-    console.log(data);
-
-    // if (dragSrcEl != this) {
-    //     // Set the source column's HTML to the HTML of the columnwe dropped on.
-    //     dragSrcEl.innerHTML = this.innerHTML;
-    //     this.innerHTML = e.dataTransfer.getData('text/html');
-    // }
-
-    if (target.classList.contains('friends--selected')) {
-        
-        let newLI = document.createElement('li');
-
-        newLI.classList.add('friend');
-        newLI.innerHTML = data;
-        target.appendChild(newLI);
-
-    }
-
-    e.preventDefault();
-
-    return false;
-})

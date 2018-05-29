@@ -1,5 +1,5 @@
 {{#each items}}
-<li class="friend" draggable="true">
+<li class="friend" draggable="true" data-id="{{id}}">
     <div class="friend__avatar">
         <img src="{{photo_50}}">
     </div>
@@ -10,17 +10,3 @@
     </div>
 </li>
 {{/each}}
-
-{{!-- {{#each chosen}}
-<li class="friend">
-    <div class="friend__avatar">
-        <img src="{{photo_50}}">
-    </div>
-    <div class="friend__name">{{first_name}} {{last_name}}</div>
- 
-    <div class="button button--close button--friends">
-        <span class="button__line button__line-h"></span>
-        <span class="button__line button__line-v"></span>
-    </div>
-</li>
-{{/each}} --}}

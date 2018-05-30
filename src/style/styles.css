@@ -48,7 +48,9 @@ body {
     width: 16px;
     height: 16px;
 }
-.button__line {
+.button:before, .button:after {
+    content: "";
+    display: block;
     background-color: #c4c4c4;
     width: 16px;
     height: 4px;
@@ -56,22 +58,22 @@ body {
     border-radius: 2px;
     transform-origin: 50% 50%;
     position: absolute;
+    bottom: 7px;
 }
-.button--close .button__line-h {
+.button--close:before {
     transform: rotate(45deg);
 }
 
-.button--close .button__line-v {
+.button--close:after{
     transform: rotate(-45deg);
 }
 
 
-
-.button--add .button__line-v {
+.button--add:before {
     transform: rotate(90deg);
 }
 
-.button--white .button__line {
+.button--white:after, .button--white:before {
     background-color: #ffffff;
 }
 

@@ -145,11 +145,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         clearList(allFriends);
-        allFriends.innerHTML = render({ 'items': all, 'chosens': false });
+        
+        // allFriends.innerHTML = render({ 'items': all, 'chosens': false });
+        allFriends.innerHTML = render( { 'items': filterFriend(searchAll.value, all), 'chosens': false });
 
         clearList(selected);
-        selected.innerHTML = render({ 'items': chosens, 'chosens': true });
-       
+        selected.innerHTML = render({ 'items': filterFriend(searchSelected.value, chosens), 'chosens': true });
+     
         e.preventDefault();
 
         return false;
@@ -173,8 +175,8 @@ document.addEventListener('DOMContentLoaded', function() {
         allFriends.innerHTML = render({ 'items': all, 'chosens': false });
 
         clearList(selected);
-        selected.innerHTML = render({ 'items': chosens, 'chosens': true });
-
+        // selected.innerHTML = render({ 'items': chosens, 'chosens': true });
+        selected.innerHTML = render({ 'items': filterFriend(searchSelected.value, chosens), 'chosens': true });
         console.log(friend);
         console.log(friendId);
     });
@@ -193,8 +195,8 @@ document.addEventListener('DOMContentLoaded', function() {
         all.push(...chosenFriend);
 
         clearList(allFriends);
-        allFriends.innerHTML = render({ 'items': all, 'chosens': false });
 
+        allFriends.innerHTML = render({ 'items': filterFriend(searchAll.value, all), 'chosens': false });
         clearList(selected);
         selected.innerHTML = render({ 'items': chosens, 'chosens': true });
 
@@ -244,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         localStorage.setItem('allFriends', JSON.stringify(all));
         localStorage.setItem('chosens', JSON.stringify(chosens));
-
+        alert('Список друзей успешно экспортирован');
     });
 
 });

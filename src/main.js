@@ -16,9 +16,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const placeInput = document.querySelector('.comment-form__place');
     const messageInput = document.querySelector('.comment-form__comment');
     const reviews = document.querySelector('.form__reviews');
-    let review = [];
     let map = document.querySelector('.map');
-
+    let reviewBuffer;
+    
     new Promise(resolve => ymaps.ready(resolve))
         .then(() => init());
 
@@ -27,17 +27,42 @@ document.addEventListener('DOMContentLoaded', function () {
     let clusterer;
 
 
+    function clearComments(form) {
 
-    function addComment(author, place, comment) {
+        while (form.hasChildNodes()) {
+            form.removeChild(form.lastChild);
+        }
+
+        reviews.innerText = "Здесь отзывов пока нет...";
+    }
+
+    function formatDate(d){
+        let result;
+        if(d){
+
+            let month = addExtraZero(d.getMonth());
+            let day = addExtraZero(d.getDate());
+            let hours = addExtraZero(d.getHours());
+            let minutes =  addExtraZero(d.getMinutes());
+            let seconds =  addExtraZero(d.getSeconds())
+
+            result = `${d.getFullYear()}.${month}.${day} ${hours}:${minutes}:${seconds}`
+        } 
+        return result;
 
     }
 
+    function addExtraZero(val){
+        return (val < 10? "0" : "") + val;
+    }
 
 //////////////////////////////////////form event handlers/////////////////////////
 
 const submitter = document.querySelector('.form__btn-submit');
+
 submitter.addEventListener('click', (e) => {
     e.preventDefault();
+    //let review = [];
 
     temporaryPlacemark = new ymaps.GeoObject({
         geometry: {
@@ -45,28 +70,45 @@ submitter.addEventListener('click', (e) => {
             coordinates: coords
         }
     });
-            
+   
+
     if (temporaryPlacemark && 
         (nameInput.value !=='') && 
         (placeInput.value !=='') && 
         (messageInput.value !=='')) {
+        let d =new Date();
+        let dateOfComment =  formatDate(d) ;
+        console.log(dateOfComment);
 
-        temporaryPlacemark.properties.set('review', {name: nameInput.value,
-                                                    place: placeInput.value,
-                                                    message: messageInput.value});
-        
+
+        const newLocal = temporaryPlacemark.properties.set('review', {
+        name: nameInput.value,
+            place: placeInput.value,
+            date: dateOfComment,
+            message: messageInput.value
+        });
+
+        // let reviewsOfPlacemark = [];
+        // reviewsOfPlacemark.push({name: nameInput.value,
+        //                         place: placeInput.value,
+        //                         date: dateOfComment,
+        //                         message: messageInput.value});
+
+        // temporaryPlacemark.properties.set('reviews', reviewsOfPlacemark);
         temporaryPlacemark.properties.set('coordinates', coords);
         temporaryPlacemark.properties.set('id', Date.now());
+
         allPlacemarks.push(temporaryPlacemark);
 
-        
-        review.push({'name': nameInput.value,
+        let reviewsData = [];
+        reviewBuffer.push({'name': nameInput.value,
+                            'date':dateOfComment,
                               'place': placeInput.value,
                               'message': messageInput.value});
 
-        console.log(review[0]);
+        console.log(reviewBuffer[0]);
         
-        reviews.innerHTML = render({'reviews': review});
+        reviews.innerHTML = render({'reviews': reviewBuffer});
         console.log(Date.now());
         console.log(allPlacemarks);
 
@@ -78,16 +120,17 @@ submitter.addEventListener('click', (e) => {
         messageInput.value = '';
         
     }
+
     
 });
 
 const closeBtn = document.querySelector('.btn-close');
 closeBtn.addEventListener('click', (e) => {
 
-    modal.classList.remove('active');
-    nameInput.value = '';
-    placeInput.value = '';
-    messageInput.value = '';
+        modal.classList.remove('active');
+        nameInput.value = '';
+        placeInput.value = '';
+        messageInput.value = '';
 
 });
 
@@ -133,98 +176,37 @@ closeBtn.addEventListener('click', (e) => {
 
         myMap.geoObjects.add(clusterer);
 
-        myMap.events.add('click', async function (e) {
-            let address = document.querySelector('.header__address');
-            coords = e.get('coords');
+/*************************MAP Click Handler*************************************/
 
-            //(+)
+    myMap.events.add('click', async function (e) {
+        let address = document.querySelector('.header__address');
+        coords = e.get('coords');
+        clearComments(reviews);    
+        modal.classList.add('active');
 
-            modal.classList.add('active');
+        try {
+            const data = await ymaps.geocode(coords);
+            const str = data.geoObjects.get(0).getAddressLine();
+            address.innerText = str;
+            reviewBuffer = [];
 
-            //  Positioning form 
-            // let posLeft = e.pageX;
-            // let posTop = e.pageY;
-            // form.style.top = `${posTop}px`;
-            // form.style.left = `${posLeft}px`;
-            //(+)
+        } catch (e) {
+            console.log(e);
+        }
 
-            // console.log(getAddress(coords));
-            // getAddress(coords).then((res) => {
-            //     address.innerText = res;
-            // });
-            
+        console.log(e.get('target'));
+        console.log("click");
 
-            // let coords = e.get('coords');
-            // myMap.geoObjects.add(
-            //     new ymaps.Placemark(coords)
-            // );
-            // let dataFromForm = {'e':e};
-        //    let myGeo = createNewPlaceMark(dataFromForm);
+    });
 
-            
-        // temporaryPlacemark = new ymaps.GeoObject({
-        //     geometry: {
-        //         type: 'Point',
-        //         coordinates: e.get('coords')
-        //     }
+    myMap.geoObjects.events.add('click', function (e) {
+     
+        // Получение ссылки на дочерний объект, на котором произошло событие.
+        var object = e.get('target');
+        if(e.get('target').geometry.getType()) {
+            console.log('placemark click')
+        }
+    });
 
-        // });
-        // console.log(temporaryPlacemark);
-        //here we can set data from form to our Placemark
-        
-        // temporaryPlacemark.properties.set('test', [1, 2, 3]);
-        // let test = temporaryPlacemark.properties.get('test');
-
-        // myMap.geoObjects.add(myGeo);
-
-           console.log(temporaryPlacemark); 
-        //    clusterer.add(myGeo);
-
-            try {
-
-                const data = await ymaps.geocode(coords);
-                const str = data.geoObjects.get(0).getAddressLine();
-                address.innerText = str;
-
-            } catch (e) {
-                console.log(e);
-            }
-            // console.log(data);
-            // function getAddress(coords) {
-
-            //     let myGeocoder = ymaps.geocode(coords);
-
-            //     myGeocoder.then(function (res) {
-
-            //         // firstGeoObject = firstGeoObject.getAddressLine();
-            //         // В качестве контента балуна задаем строку с адресом объекта.
-
-            //         let firstGeoObject = res.geoObjects.get(0);
-
-            //         let str = firstGeoObject.getAddressLine();
-            //         // return str;
-            //        address.innerText = 123;
-
-            //     });
-
-            // }
-
-        })
-
-        // if (!myMap.balloon.isOpen()) {
-        //     var coords = e.get('coords');
-
-        //     myMap.balloon.open(coords, {
-        //         contentHeader: 'Событие!',
-        //         contentBody: '<p>Кто-то щелкнул по карте.</p>' +
-        //         '<p>Координаты щелчка: ' + [
-        //             coords[0].toPrecision(6),
-        //             coords[1].toPrecision(6)
-        //         ].join(', ') + '</p>',
-        //         contentFooter: '<sup>Щелкните еще раз</sup>'
-        //     });
-        // } else {
-        //     myMap.balloon.close();
-        // }
     }
 })

@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function () {
     let allPlacemarks = [];
     // let currentMark;
     let form = document.querySelector('.form');
-    let modal = document.querySelector('.form-overlay');
     const nameInput = document.querySelector('.comment-form__name');
     const placeInput = document.querySelector('.comment-form__place');
     const messageInput = document.querySelector('.comment-form__comment');
@@ -56,7 +55,59 @@ document.addEventListener('DOMContentLoaded', function () {
         return (val < 10? "0" : "") + val;
     }
 
+    function formPositioning(elem, posLeft, posTop) {
+        let windowWidth = document.documentElement.clientWidth;
+        let windowHeight = document.documentElement.clientHeight;
+        // let elemCoords = elem.getBoundingClientRect();
+        let elemWidth = elem.getBoundingClientRect().width;
+        let elemHeight = elem.getBoundingClientRect().height;
+        let elemPosLeft = posLeft + elemWidth;
+        let elemPosTop = posTop + elemHeight;
+        let xDifference = windowWidth - elemPosLeft;
+        let yDifference = windowHeight - elemPosTop;
+
+        if(xDifference < 0) {
+
+            // elem.style.left = `${posLeft + xDifference -50}px`;
+            if(posLeft > windowWidth/2) {
+                elem.style.left = `${posLeft + xDifference - 50}px`;
+                console.log('left more than half wind width');
+            } else {
+                elem.style.left = `${posLeft + xDifference}px`;
+            }
+
+        } else {
+            elem.style.left = `${posLeft}px`;
+        }
+
+        if(yDifference < 0 ) {
+            elem.style.top = `${posTop + yDifference -50}px`;
+        } else {
+            elem.style.top = `${posTop}px`;
+        }
+   
+
+        console.log('windowWidth'+ windowWidth);
+        console.log('windowHeight' + windowHeight);
+        console.dir('xDifference' + xDifference);
+        console.dir('yDifference' + yDifference);
+        console.dir(elemWidth);
+        // elem.style.top = `${posTop}px`;
+        // elem.style.left = `${posLeft}px`;
+    }
+
 //////////////////////////////////////form event handlers/////////////////////////
+
+map.addEventListener('click', (e) => {
+
+    let posTop = e.pageY;
+    let posLeft = e.pageX;
+    formPositioning(form, posLeft, posTop);
+    console.log('posTop' + posTop);
+    console.log('posLeft' + posLeft);
+
+
+})
 
 const submitter = document.querySelector('.form__btn-submit');
 
@@ -127,12 +178,13 @@ submitter.addEventListener('click', (e) => {
 const closeBtn = document.querySelector('.btn-close');
 closeBtn.addEventListener('click', (e) => {
 
-        modal.classList.remove('active');
+        form.classList.remove('active');
         nameInput.value = '';
         placeInput.value = '';
         messageInput.value = '';
 
 });
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -182,7 +234,9 @@ closeBtn.addEventListener('click', (e) => {
         let address = document.querySelector('.header__address');
         coords = e.get('coords');
         clearComments(reviews);    
-        modal.classList.add('active');
+        form.classList.add('active');
+
+        
 
         try {
             const data = await ymaps.geocode(coords);
@@ -205,6 +259,7 @@ closeBtn.addEventListener('click', (e) => {
         var object = e.get('target');
         if(e.get('target').geometry.getType()) {
             console.log('placemark click')
+
         }
     });
 

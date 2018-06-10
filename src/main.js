@@ -2,14 +2,12 @@ import './style/styles.css';
 
 import render from './templates/review.hbs';
 
-// const map = document.querySelector('.map');
 
 document.addEventListener('DOMContentLoaded', function () {
 
     let temporaryPlacemark;
     let coords;
     let allPlacemarks = [];
-    // let currentMark;
     let form = document.querySelector('.form');
     const nameInput = document.querySelector('.comment-form__name');
     const placeInput = document.querySelector('.comment-form__place');
@@ -17,11 +15,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const reviews = document.querySelector('.form__reviews');
     let map = document.querySelector('.map');
     let reviewBuffer;
+    let addressFromCoords;
     
     new Promise(resolve => ymaps.ready(resolve))
         .then(() => init());
 
-    // ymaps.ready(init);
     let myMap;
     let clusterer;
 
@@ -58,7 +56,6 @@ document.addEventListener('DOMContentLoaded', function () {
     function formPositioning(elem, posLeft, posTop) {
         let windowWidth = document.documentElement.clientWidth;
         let windowHeight = document.documentElement.clientHeight;
-        // let elemCoords = elem.getBoundingClientRect();
         let elemWidth = elem.getBoundingClientRect().width;
         let elemHeight = elem.getBoundingClientRect().height;
         let elemPosLeft = posLeft + elemWidth;
@@ -68,7 +65,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if(xDifference < 0) {
 
-            // elem.style.left = `${posLeft + xDifference -50}px`;
             if(posLeft > windowWidth/2) {
                 elem.style.left = `${posLeft + xDifference - 50}px`;
                 console.log('left more than half wind width');
@@ -86,15 +82,15 @@ document.addEventListener('DOMContentLoaded', function () {
             elem.style.top = `${posTop}px`;
         }
    
-
-        console.log('windowWidth'+ windowWidth);
-        console.log('windowHeight' + windowHeight);
-        console.dir('xDifference' + xDifference);
-        console.dir('yDifference' + yDifference);
-        console.dir(elemWidth);
-        // elem.style.top = `${posTop}px`;
-        // elem.style.left = `${posLeft}px`;
     }
+
+    function setBalloonContent(placemarks) {
+
+        for(let i=0; i < placemarks.length;i++) {
+
+        }
+
+    };
 
 //////////////////////////////////////form event handlers/////////////////////////
 
@@ -113,15 +109,15 @@ const submitter = document.querySelector('.form__btn-submit');
 
 submitter.addEventListener('click', (e) => {
     e.preventDefault();
-    //let review = [];
 
     temporaryPlacemark = new ymaps.GeoObject({
         geometry: {
             type: 'Point',
             coordinates: coords
-        }
+        },
+    
     });
-   
+    temporaryPlacemark.options.set('hasBalloon', false);
 
     if (temporaryPlacemark && 
         (nameInput.value !=='') && 
@@ -129,8 +125,6 @@ submitter.addEventListener('click', (e) => {
         (messageInput.value !=='')) {
         let d =new Date();
         let dateOfComment =  formatDate(d) ;
-        console.log(dateOfComment);
-
 
         const newLocal = temporaryPlacemark.properties.set('review', {
         name: nameInput.value,
@@ -148,20 +142,23 @@ submitter.addEventListener('click', (e) => {
         // temporaryPlacemark.properties.set('reviews', reviewsOfPlacemark);
         temporaryPlacemark.properties.set('coordinates', coords);
         temporaryPlacemark.properties.set('id', Date.now());
+        temporaryPlacemark.properties.set('balloonContentHeader', placeInput.value);
+        temporaryPlacemark.properties.set('balloonContentBody', messageInput.value);
+        temporaryPlacemark.properties.set('balloonContentLink', addressFromCoords);
+        temporaryPlacemark.properties.set('balloonContentFooter', dateOfComment);
+
 
         allPlacemarks.push(temporaryPlacemark);
 
         let reviewsData = [];
         reviewBuffer.push({'name': nameInput.value,
                             'date':dateOfComment,
-                              'place': placeInput.value,
-                              'message': messageInput.value});
+                            'place': placeInput.value,
+                            'message': messageInput.value});
 
-        console.log(reviewBuffer[0]);
         
         reviews.innerHTML = render({'reviews': reviewBuffer});
-        console.log(Date.now());
-        console.log(allPlacemarks);
+
 
         myMap.geoObjects.add(temporaryPlacemark);
         clusterer.add(temporaryPlacemark);
@@ -186,27 +183,47 @@ closeBtn.addEventListener('click', (e) => {
 });
 
 
-///////////////////////////////////////////////////////////////////////////////
+// *************************************ADDRESS LINK CLICK HANDLER ***********************************************
 
-    // function createNewPlaceMark(dataFromForm){
-       
-    //     let myGeo = new ymaps.GeoObject({
-    //         geometry: {
-    //             type: 'Point',
-    //             coordinates: dataFromForm.e.get('coords')
-    //         }
+document.addEventListener('click', (e) => {
+    
+    if(e.target.classList.contains('ballon_address')) {
+        console.log("Link clicked");
+        console.log(clusterer.getGeoObjects());
+        let clusterizedObjects = clusterer.getGeoObjects();
+        let coords = e.target.dataset.coords;
+        console.log(coords);
+        console.log(...clusterizedObjects[0].properties.get('coordinates'));
+     
 
-    //     });
-    //     console.log(myGeo);
-    //     //here we can set data from form to our Placemark
+        let elemOfSameAddress = clusterizedObjects.filter(elem => {
+            let strOfCoords = elem.properties.get('coordinates').join();
+             if(strOfCoords === coords) {
+                 return elem;
+             }
+        });
+
+        let reviewsToRender = [];
+         for(let elem of elemOfSameAddress) {
+
+            reviewsToRender.push(elem.properties.get('review'));
+
+         }
         
-    //     myGeo.properties.set('test', [1, 2, 3]);
-    //     let test = myGeo.properties.get('test');
-    //     console.log(test);
-    //     myMap.geoObjects.add(myGeo);
-    //     return myGeo;
-    // }
 
+        console.log(elemOfSameAddress);
+        console.log(elemOfSameAddress[0].properties.get('review'));
+        console.log(reviewsToRender);
+
+        clearComments(reviews);    
+        form.classList.add('active');
+        reviews.innerHTML = render({'reviews': reviewsToRender});
+        clusterer.balloon.close();
+      
+    }
+})
+
+///////////////////////////////////////////////////////////////////////////////
 
     function init() {
 
@@ -218,12 +235,25 @@ closeBtn.addEventListener('click', (e) => {
             searchControlProvider: 'yandex#search'
         });
 
+        var customItemContentLayout = ymaps.templateLayoutFactory.createClass(
+            // Флаг "raw" означает, что данные вставляют "как есть" без экранирования html.
+            '<h2 class=ballon_header>{{ properties.balloonContentHeader|raw }}</h2>' +
+                '<a href="#" data-coords={{properties.coordinates}} class=ballon_address>{{ properties.balloonContentLink|raw }}</a>' +
+                '<div class=ballon_body>{{ properties.balloonContentBody|raw }}</div>' +
+                '<div class=ballon_footer>{{ properties.balloonContentFooter|raw }}</div>'
+        );
+
+
+        
          clusterer = new ymaps.Clusterer({
             preset: 'islands#invertedVioletClusterIcons',
             groupByCoordinates: false,
             clusterDisableClickZoom: true,
             clusterHideIconOnBalloonOpen: false,
-            geoObjectHideIconOnBalloonOpen: false
+            geoObjectHideIconOnBalloonOpen: false,
+            clusterBalloonContentLayout: 'cluster#balloonCarousel',
+            // Устанавливаем собственный макет.
+            clusterBalloonItemContentLayout: customItemContentLayout
         });
 
         myMap.geoObjects.add(clusterer);
@@ -240,27 +270,36 @@ closeBtn.addEventListener('click', (e) => {
 
         try {
             const data = await ymaps.geocode(coords);
-            const str = data.geoObjects.get(0).getAddressLine();
-            address.innerText = str;
+            addressFromCoords = data.geoObjects.get(0).getAddressLine();
+            address.innerText = addressFromCoords;
             reviewBuffer = [];
 
         } catch (e) {
             console.log(e);
         }
 
-        console.log(e.get('target'));
-        console.log("click");
 
     });
 
     myMap.geoObjects.events.add('click', function (e) {
-     
-        // Получение ссылки на дочерний объект, на котором произошло событие.
-        var object = e.get('target');
-        if(e.get('target').geometry.getType()) {
-            console.log('placemark click')
 
+        let reviewOfCurrentPlace = [];
+     
+        var object = e.get('target');
+        if(e.get('target').options.getName() === 'geoObject') {
+
+            reviewOfCurrentPlace.push(e.get('target').properties.get('review'));
+            clearComments(reviews); 
+            form.classList.add('active');
+            reviews.innerHTML = render({'reviews': reviewOfCurrentPlace});
+
+
+
+            console.log('placemark click');
+            console.log(e.get('target'));
+            console.log(e.get('target').options.getName());
         }
+
     });
 
     }
